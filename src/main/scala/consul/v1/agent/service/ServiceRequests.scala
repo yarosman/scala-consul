@@ -42,7 +42,7 @@ object ServiceRequests {
       rb.responseStatusRequestMaker(fullPathFor("register"), _.put(Json.toJson(localService)))(_ == Status.OK)
 
     def deregister(serviceID: ServiceId): Future[Boolean] =
-      rb.responseStatusRequestMaker(fullPathFor(s"deregister/$serviceID"), _.get())(_ == Status.OK)
+      rb.responseStatusRequestMaker(fullPathFor(s"deregister/$serviceID"), _.put(JsNull))(_ == Status.OK)
 
     private def fullPathFor(path: String) = s"$basePath/service/$path"
 

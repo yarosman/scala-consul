@@ -3,7 +3,7 @@ package consul.v1.agent.check
 import consul.v1.common.ConsulRequestBasics
 import consul.v1.common.Types.CheckId
 import play.api.http.Status
-import play.api.libs.json.{Writes, Json}
+import play.api.libs.json.{JsNull, Json, Writes}
 import play.api.libs.ws.WSRequest
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -53,7 +53,7 @@ object CheckRequests{
     )(_ == Status.OK)
 
     def deregister(checkId: CheckId): Future[Boolean] = rb.responseStatusRequestMaker(
-      fullPathFor(s"deregister/$checkId"),_.get()
+      fullPathFor(s"deregister/$checkId"),_.put(JsNull)
     )(_ == Status.OK)
 
     def pass(checkId: CheckId,note:Option[String]): Future[Boolean] = functionForStatus("pass")(checkId,note)
@@ -65,7 +65,7 @@ object CheckRequests{
     private def functionForStatus(status:String) = (checkId: CheckId,note:Option[String]) =>
       rb.responseStatusRequestMaker(
         fullPathFor(s"$status/$checkId"),
-        (r:WSRequest) => note.map{ case note => r.withQueryString("note"->note) }.getOrElse( r ).get()
+        (r:WSRequest) => note.map{ case note => r.withQueryString("note"->note) }.getOrElse( r ).put(JsNull)
       )(_ == Status.OK)
 
     private def fullPathFor(path: String) = s"$basePath/check/$path"
